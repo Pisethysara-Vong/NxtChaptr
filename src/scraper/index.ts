@@ -1,3 +1,4 @@
+import { Browser } from "puppeteer";
 import { Scraper, ScrapeResult } from "../types/scraper";
 
 const scrapers: Scraper[] = [];
@@ -12,7 +13,7 @@ export function getScraper(url: string): Scraper {
   return scraper;
 }
 
-export async function scrapeUrl(url: string): Promise<ScrapeResult> {
+export async function scrapeUrl(url: string, browser: Browser): Promise<ScrapeResult> {
   const scraper = getScraper(url);
-  return scraper.scrape(url);
+  return scraper.scrape(url, browser);
 }

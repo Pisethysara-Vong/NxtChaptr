@@ -1,3 +1,5 @@
+import { Browser } from "puppeteer";
+
 export interface Chapter {
   id: string;      // chapter identifier, e.g. "24", "25.5"
   title?: string;  // optional chapter title, e.g. "Chapter 25: Awakening"
@@ -12,5 +14,5 @@ export interface ScrapeResult {
 export interface Scraper {
   siteName: string;
   canHandle(url: string): boolean;
-  scrape(url: string): Promise<ScrapeResult>;
+  scrape(url: string, browser: Browser): Promise<ScrapeResult>;
 }

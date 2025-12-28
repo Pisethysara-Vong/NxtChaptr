@@ -1,6 +1,6 @@
-import puppeteer from "puppeteer";
 import * as cheerio from "cheerio";
-import { Scraper, ScrapeResult, Chapter } from "../types/scraper";
+import { Browser } from "puppeteer";
+import { Chapter, Scraper, ScrapeResult } from "../types/scraper";
 
 interface GenericScraperConfig {
   titleSelector: string;
@@ -22,35 +22,31 @@ export class GenericScraper implements Scraper {
     return url.includes(this.siteName);
   }
 
-  async scrape(url: string): Promise<ScrapeResult> {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+  async scrape(url: string, browser: Browser): Promise<ScrapeResult> {
     const page = await browser.newPage();
 
-    // Use realistic User-Agent to avoid bot blocking
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
     );
 
     await page.goto(url, { waitUntil: "networkidle2" });
 
-    // Wait for chapter list to load (important for dynamic sites)
-    await page.waitForSelector(this.config.chapterSelector);
+    await page.waitForSelector(this.config.chapterSelector, {
+      timeout: 20000,
+    });
 
     const html = await page.content();
     const $ = cheerio.load(html);
 
-    // Get story title
     const storyTitle = $(this.config.titleSelector).first().text().trim();
 
     const chapters: Chapter[] = [];
     $(this.config.chapterSelector).each((_, el) => {
-      const id = $(el).find("span:nth-child(1)").text().trim(); // 'chapter 106', 'chapter 105', etc.
+      const id = $(el).find("span:nth-child(1)").text().trim();
       const title = this.config.chapterTitleSelector
         ? $(el).find(this.config.chapterTitleSelector).text().trim()
-        : id; // fallback to id if no separate title selector
+        : id;
+
       const chapterUrl = $(el)
         .find(this.config.chapterUrlSelector || "a")
         .attr("href");
@@ -58,7 +54,7 @@ export class GenericScraper implements Scraper {
       chapters.push({ id, title, url: chapterUrl });
     });
 
-    await browser.close();
+    await page.close(); // 🔑 VERY IMPORTANT
     return { storyTitle, chapters };
   }
 }
