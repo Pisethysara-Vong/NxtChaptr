@@ -1,0 +1,16 @@
+export interface Chapter {
+  id: string;      // chapter identifier, e.g. "24", "25.5"
+  title?: string;  // optional chapter title, e.g. "Chapter 25: Awakening"
+  url?: string;    // link to the chapter page if available
+}
+
+export interface ScrapeResult {
+  storyTitle: string;
+  chapters: Chapter[]; // ordered newest → oldest
+}
+
+export interface Scraper {
+  siteName: string;
+  canHandle(url: string): boolean;
+  scrape(url: string): Promise<ScrapeResult>;
+}

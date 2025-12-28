@@ -1,0 +1,44 @@
+{
+  "stories": [
+    {
+      "id": "kagurabachi",
+      "title": "Kagurabachi",
+      "url": "https://weebcentral.com/series/01J76XYGGM22WZP7T4TKA4ZFAF/Kagurabachi",
+      "lastKnownChapter": "Chapter 106",
+      "lastCheckedAt": "2025-12-28T08:00:36.337Z",
+      "failureCount": 0
+    },
+    {
+      "id": "blue-box",
+      "title": "Blue Box",
+      "url": "https://weebcentral.com/series/01J76XYEMXXHG63FKC2DMTNC7B/Blue-Box",
+      "lastKnownChapter": "# 224",
+      "lastCheckedAt": "2025-12-28T08:00:39.791Z",
+      "failureCount": 0
+    },
+    {
+      "id": "ichi-the-witch",
+      "title": "Ichi the Witch",
+      "url": "https://weebcentral.com/series/01JBQ6PW20207W4RPSM5X4192B/ichi-the-witch",
+      "lastKnownChapter": "Hunt 64",
+      "lastCheckedAt": "2025-12-28T08:00:43.104Z",
+      "failureCount": 0
+    },
+    {
+      "id": "akane-banashi",
+      "title": "Akane-Banashi",
+      "url": "https://weebcentral.com/series/01J76XYFBDW005SQ7TQNV8FW28/Akane-banashi",
+      "lastKnownChapter": "Story 188",
+      "lastCheckedAt": "2025-12-28T08:00:46.205Z",
+      "failureCount": 0
+    },
+    {
+      "id": "sakamoto-days",
+      "title": "Sakamoto Days",
+      "url": "https://weebcentral.com/series/01J76XYE3130E1W5HKTJ7VD912/Sakamoto-Days",
+      "lastKnownChapter": "Days 242",
+      "lastCheckedAt": "2025-12-28T08:00:49.547Z",
+      "failureCount": 0
+    }
+  ]
+}
