@@ -23,7 +23,10 @@ export class GenericScraper implements Scraper {
   }
 
   async scrape(url: string): Promise<ScrapeResult> {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     const page = await browser.newPage();
 
     // Use realistic User-Agent to avoid bot blocking
@@ -48,7 +51,9 @@ export class GenericScraper implements Scraper {
       const title = this.config.chapterTitleSelector
         ? $(el).find(this.config.chapterTitleSelector).text().trim()
         : id; // fallback to id if no separate title selector
-      const chapterUrl = $(el).find(this.config.chapterUrlSelector || "a").attr("href");
+      const chapterUrl = $(el)
+        .find(this.config.chapterUrlSelector || "a")
+        .attr("href");
 
       chapters.push({ id, title, url: chapterUrl });
     });

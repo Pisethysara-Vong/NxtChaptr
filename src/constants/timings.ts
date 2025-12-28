@@ -1,2 +1,2 @@
 // Auto-update stories every X minutes
-export const INTERVAL_MINUTES = 30;
+export const INTERVAL_MINUTES = 15;
