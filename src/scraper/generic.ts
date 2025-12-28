@@ -29,11 +29,26 @@ export class GenericScraper implements Scraper {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
     );
 
-    await page.goto(url, { waitUntil: "networkidle2" });
-
-    await page.waitForSelector(this.config.chapterSelector, {
-      timeout: 20000,
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      const type = req.resourceType();
+      if (["image", "font", "media"].includes(type)) {
+        req.abort();
+      } else {
+        req.continue();
+      }
     });
+
+    await page.goto(url, {
+      waitUntil: "domcontentloaded",
+      timeout: 60000, // 60s
+    });
+
+    await page
+      .waitForSelector(this.config.chapterSelector, {
+        timeout: 20000,
+      })
+      .catch(() => null);
 
     const html = await page.content();
     const $ = cheerio.load(html);
@@ -54,7 +69,7 @@ export class GenericScraper implements Scraper {
       chapters.push({ id, title, url: chapterUrl });
     });
 
-    await page.close(); // 🔑 VERY IMPORTANT
+    await page.close(); // VERY IMPORTANT
     return { storyTitle, chapters };
   }
 }

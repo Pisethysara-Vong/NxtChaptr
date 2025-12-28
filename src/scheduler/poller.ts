@@ -44,6 +44,7 @@ export async function updateStories(): Promise<void> {
       } catch (err) {
         console.error(`Failed to scrape ${story.title}:`, err);
       }
+      await new Promise((r) => setTimeout(r, 4000));
     }
   } finally {
     await closeBrowser(); // ✅ clean shutdown
