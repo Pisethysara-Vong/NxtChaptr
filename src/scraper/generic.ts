@@ -41,7 +41,7 @@ export class GenericScraper implements Scraper {
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
-      timeout: 60000, // 60s
+      timeout: 20000, // 60s
     });
 
     await page

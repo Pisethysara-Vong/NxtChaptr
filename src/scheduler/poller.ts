@@ -27,7 +27,11 @@ export async function updateStories(): Promise<void> {
 
         if (lastKnownIndex === -1) {
           newChapters = chapters;
-        } else if (lastKnownIndex > 0) {
+        } else if (lastKnownIndex === 0) {
+          logInfo(`No new chapters for ${story.title}. Skipping update.`);
+          story.lastCheckedAt = new Date().toISOString();
+          continue;
+        } else {
           newChapters = chapters.slice(0, lastKnownIndex);
         }
 
@@ -36,7 +40,7 @@ export async function updateStories(): Promise<void> {
           await notifyNewChapters(story.title, newChapters, story.url);
 
           logInfo(
-            `Updated ${story.title} with ${newChapters.length} new chapter(s).`
+            `Updated ${story.title} with ${newChapters.length} new chapter(s). Latest: ${story.lastKnownChapter}`
           );
         }
 
@@ -44,7 +48,7 @@ export async function updateStories(): Promise<void> {
       } catch (err) {
         console.error(`Failed to scrape ${story.title}:`, err);
       }
-      await new Promise((r) => setTimeout(r, 4000));
+      await new Promise((r) => setTimeout(r, 3000));
     }
   } finally {
     await closeBrowser(); // ✅ clean shutdown
