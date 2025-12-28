@@ -1,9 +1,8 @@
 import express from "express";
-import "./scraper/registerScrapers"; // Register all scrapers
-import { updateStories } from "./scheduler/poller";
-import { logInfo } from "./utils/logger";
 import { INTERVAL_MINUTES } from "./constants/timings";
-import { sendTelegramMessage } from "./services/telegram";
+import { updateStories } from "./scheduler/poller";
+import "./scraper/registerScrapers"; // Register all scrapers
+import { logInfo } from "./utils/logger";
 
 const app = express();
 
@@ -35,7 +34,5 @@ setInterval(async () => {
     isUpdating = false;
   }
 }, INTERVAL_MINUTES * 60 * 1000);
-
-sendTelegramMessage("Hello from server. This is a message to test that telegram service is working.");
 
 export default app;

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { StoriesStore } from "../types/story";
 
-const STORIES_PATH = path.join(__dirname, "../config/stories.json");
+const STORIES_PATH = path.join(process.cwd(), "src/config/stories.json");
 
 export function readStories(): StoriesStore {
   const raw = fs.readFileSync(STORIES_PATH, "utf-8");
