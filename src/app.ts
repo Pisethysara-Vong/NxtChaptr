@@ -3,6 +3,7 @@ import { INTERVAL_MINUTES } from "./constants/timings";
 import { updateStories } from "./scheduler/poller";
 import "./scraper/registerScrapers"; // Register all scrapers
 import { logInfo } from "./utils/logger";
+import { sendTelegramMessage } from "./services/telegram";
 
 const app = express();
 
@@ -21,6 +22,9 @@ app.get("/health", (req, res) => res.send("Server is running"));
 // seedStories().catch((err) => {
 //   console.error("Error seeding stories:", err);
 // });
+sendTelegramMessage('Testing Telegram notification on prod').catch((err) => {
+  console.error("Error sending test Telegram message:", err);
+});
 
 let isUpdating = false;
 
