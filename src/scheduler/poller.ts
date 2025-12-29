@@ -22,6 +22,9 @@ export async function updateStories(): Promise<void> {
         const lastKnownIndex = chapters.findIndex(
           (ch) => ch.title === lastKnown
         );
+        logInfo(
+          `${story.title} | lastKnown="${lastKnown}" | index=${lastKnownIndex} | total=${chapters.length}`
+        );
 
         let newChapters: Chapter[] = [];
 
@@ -33,16 +36,23 @@ export async function updateStories(): Promise<void> {
           continue;
         } else {
           newChapters = chapters.slice(0, lastKnownIndex);
+          logInfo(chapters.join("--"));
+
+          if (newChapters.length === 0) {
+            logInfo(`No new chapters for ${story.title} (ordering mismatch).`);
+            story.lastCheckedAt = new Date().toISOString();
+            continue;
+          }
         }
 
-        if (newChapters.length > 0) {
-          story.lastKnownChapter = newChapters[0].title || lastKnown;
-          await notifyNewChapters(story.title, newChapters, story.url);
+        // if (newChapters.length > 0) {
+        //   story.lastKnownChapter = newChapters[0].title || lastKnown;
+        //   await notifyNewChapters(story.title, newChapters, story.url);
 
-          logInfo(
-            `Updated ${story.title} with ${newChapters.length} new chapter(s). Latest: ${story.lastKnownChapter}`
-          );
-        }
+        //   logInfo(
+        //     `Updated ${story.title} with ${newChapters.length} new chapter(s). Latest: ${story.lastKnownChapter}`
+        //   );
+        // }
 
         story.lastCheckedAt = new Date().toISOString();
       } catch (err) {
