@@ -1,6 +1,6 @@
 import express from "express";
 import { INTERVAL_MINUTES } from "./constants/timings";
-import { seedStories, updateStories } from "./scheduler/poller";
+import { updateStories } from "./scheduler/poller";
 import "./scraper/registerScrapers"; // Register all scrapers
 import { logInfo } from "./utils/logger";
 
