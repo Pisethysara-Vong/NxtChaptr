@@ -18,9 +18,9 @@ app.get("/update-stories", async (req, res) => {
 
 app.get("/health", (req, res) => res.send("Server is running"));
 
-seedStories().catch((err) => {
-  console.error("Error seeding stories:", err);
-});
+// seedStories().catch((err) => {
+//   console.error("Error seeding stories:", err);
+// });
 
 let isUpdating = false;
 
