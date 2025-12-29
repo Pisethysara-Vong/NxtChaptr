@@ -41,12 +41,12 @@ export class GenericScraper implements Scraper {
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
-      timeout: 20000, // 60s
+      timeout: 15000,
     });
 
     await page
       .waitForSelector(this.config.chapterSelector, {
-        timeout: 20000,
+        timeout: 15000,
       })
       .catch(() => null);
 

@@ -1,5 +1,5 @@
 {
-  "name": "stories-tracker",
+  "name": "nxtchaptr",
   "version": "1.0.0",
   "description": "A web application to track updates from various story sources and notify users via email.",
   "main": "index.js",

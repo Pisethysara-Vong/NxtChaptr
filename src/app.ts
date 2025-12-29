@@ -1,6 +1,6 @@
 import express from "express";
 import { INTERVAL_MINUTES } from "./constants/timings";
-import { updateStories } from "./scheduler/poller";
+import { seedStories, updateStories } from "./scheduler/poller";
 import "./scraper/registerScrapers"; // Register all scrapers
 import { logInfo } from "./utils/logger";
 
@@ -17,6 +17,10 @@ app.get("/update-stories", async (req, res) => {
 });
 
 app.get("/health", (req, res) => res.send("Server is running"));
+
+seedStories().catch(err => {
+  console.error("Error seeding stories:", err);
+});
 
 let isUpdating = false;
 
