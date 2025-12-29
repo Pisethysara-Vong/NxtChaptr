@@ -1,4 +1,3 @@
-import * as cheerio from "cheerio";
 import { Browser } from "puppeteer";
 import { Chapter, Scraper, ScrapeResult } from "../types/scraper";
 
@@ -25,51 +24,63 @@ export class GenericScraper implements Scraper {
   async scrape(url: string, browser: Browser): Promise<ScrapeResult> {
     const page = await browser.newPage();
 
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
-    );
+    try {
+      await page.setUserAgent(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+      );
 
-    await page.setRequestInterception(true);
-    page.on("request", (req) => {
-      const type = req.resourceType();
-      if (["image", "font", "media"].includes(type)) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
+      await page.setRequestInterception(true);
+      page.on("request", (req) => {
+        const type = req.resourceType();
+        if (["image", "font", "media"].includes(type)) {
+          req.abort();
+        } else {
+          req.continue();
+        }
+      });
 
-    await page.goto(url, {
-      waitUntil: "domcontentloaded",
-      timeout: 15000,
-    });
-
-    await page
-      .waitForSelector(this.config.chapterSelector, {
+      await page.goto(url, {
+        waitUntil: "domcontentloaded",
         timeout: 15000,
-      })
-      .catch(() => null);
+      });
 
-    const html = await page.content();
-    const $ = cheerio.load(html);
+      await page
+        .waitForSelector(this.config.chapterSelector, { timeout: 15000 })
+        .catch(() => null);
 
-    const storyTitle = $(this.config.titleSelector).first().text().trim();
+      const result = await page.evaluate((config) => {
+        const titleEl = document.querySelector(config.titleSelector);
+        const storyTitle = titleEl?.textContent?.trim() || "";
 
-    const chapters: Chapter[] = [];
-    $(this.config.chapterSelector).each((_, el) => {
-      const id = $(el).find("span:nth-child(1)").text().trim();
-      const title = this.config.chapterTitleSelector
-        ? $(el).find(this.config.chapterTitleSelector).text().trim()
-        : id;
+        const chapters: Chapter[] = Array.from(
+          document.querySelectorAll(config.chapterSelector)
+        ).map((el) => {
+          const id = config.chapterTitleSelector
+            ? el
+                .querySelector(config.chapterTitleSelector)
+                ?.textContent?.trim() || ""
+            : "";
 
-      const chapterUrl = $(el)
-        .find(this.config.chapterUrlSelector || "a")
-        .attr("href");
+          const title = config.chapterTitleSelector
+            ? el
+                .querySelector(config.chapterTitleSelector)
+                ?.textContent?.trim() || id
+            : id;
 
-      chapters.push({ id, title, url: chapterUrl });
-    });
+          const url =
+            el
+              .querySelector(config.chapterUrlSelector || "a")
+              ?.getAttribute("href") || null;
 
-    await page.close(); // VERY IMPORTANT
-    return { storyTitle, chapters };
+          return { id, title, url };
+        });
+
+        return { storyTitle, chapters };
+      }, this.config);
+
+      return result;
+    } finally {
+      await page.close(); // GUARANTEED cleanup
+    }
   }
 }

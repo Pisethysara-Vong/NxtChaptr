@@ -1,9 +1,9 @@
 import { Browser } from "puppeteer";
 
 export interface Chapter {
-  id: string;      // chapter identifier, e.g. "24", "25.5"
-  title?: string;  // optional chapter title, e.g. "Chapter 25: Awakening"
-  url?: string;    // link to the chapter page if available
+  id: string; // chapter identifier, e.g. "24", "25.5"
+  title?: string; // optional chapter title, e.g. "Chapter 25: Awakening"
+  url?: string | null; // link to the chapter page if available
 }
 
 export interface ScrapeResult {
