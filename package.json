@@ -4,7 +4,8 @@
   "description": "A web application to track updates from various story sources and notify users via email.",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "seeder": "ts-node src/seed.ts",
     "build": "tsc",
     "postbuild": "cp -r src/config dist/config",
     "start": "node dist/server.js",

@@ -13,7 +13,12 @@ export function getScraper(url: string): Scraper {
   return scraper;
 }
 
-export async function scrapeUrl(url: string, browser: Browser): Promise<ScrapeResult> {
+export async function scrapeUrl(url: string, browser: Browser, lastKnownChapter: string | null): Promise<ScrapeResult> {
   const scraper = getScraper(url);
-  return scraper.scrape(url, browser);
+  return scraper.scrape_update(url, browser, lastKnownChapter || "");
+}
+
+export async function scrapeSeed(url: string, browser: Browser): Promise<ScrapeResult> {
+  const scraper = getScraper(url);
+  return scraper.scrape_seed(url, browser);
 }

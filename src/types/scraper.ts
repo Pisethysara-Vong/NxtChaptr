@@ -14,5 +14,6 @@ export interface ScrapeResult {
 export interface Scraper {
   siteName: string;
   canHandle(url: string): boolean;
-  scrape(url: string, browser: Browser): Promise<ScrapeResult>;
+  scrape_update(url: string, browser: Browser, lastKnown: string): Promise<ScrapeResult>;
+  scrape_seed(url: string, browser: Browser): Promise<ScrapeResult>;
 }

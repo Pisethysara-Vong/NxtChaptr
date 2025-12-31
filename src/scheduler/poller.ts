@@ -1,104 +1,61 @@
-import { readStories, writeStories } from "../utils/fileStore";
+import { BATCH_SIZE } from "../constants/constants";
 import { scrapeUrl } from "../scraper";
-import { logInfo } from "../utils/logger";
-import { notifyNewChapters } from "../services/notifier";
 import { closeBrowser, getBrowser } from "../scraper/browser";
-import { Chapter } from "../types/scraper";
+import { notifyNewChapters } from "../services/notifier";
+import { Story } from "../types/story";
+import { chunkArray } from "../utils/chuckArray";
+import { readStories, writeStories } from "../utils/fileStore";
+import { logInfo } from "../utils/logger";
 
 export async function updateStories(): Promise<void> {
   const data = readStories();
   const stories = data.stories;
   const browser = await getBrowser();
+  const batches = chunkArray(stories, BATCH_SIZE);
 
   try {
-    for (const story of stories) {
-      logInfo(`Scraping: ${story.title}`);
-      try {
-        const result = await scrapeUrl(story.url, browser);
+    for (const batch of batches) {
+      logInfo(`Processing batch of ${batch.length} stories`);
 
-        const chapters = result.chapters;
-        const lastKnown = story.lastKnownChapter;
+      await Promise.all(
+        batch.map(async (story: Story) => {
+          logInfo(`Scraping: ${story.title}`);
+          const storyUrl = story.url;
+          const lastKnownChapter = story.lastKnownChapter;
 
-        const lastKnownIndex = chapters.findIndex(
-          (ch) => ch.title === lastKnown
-        );
-        logInfo(
-          `${story.title} | lastKnown="${lastKnown}" | index=${lastKnownIndex} | total=${chapters.length}`
-        );
+          try {
+            const result = await scrapeUrl(storyUrl, browser, lastKnownChapter);
+            const chapters = result.chapters;
 
-        let newChapters: Chapter[] = [];
+            if (chapters.length === 0) {
+              logInfo(`⏩ No new chapters found for ${story.title}. Skipping.`);
+              story.lastCheckedAt = new Date().toISOString();
+              return;
+            }
 
-        if (lastKnownIndex === -1) {
-          newChapters = chapters;
-        } else if (lastKnownIndex === 0) {
-          logInfo(`No new chapters for ${story.title}. Skipping update.`);
-          story.lastCheckedAt = new Date().toISOString();
-          continue;
-        } else {
-          newChapters = chapters.slice(0, lastKnownIndex);
-          logInfo(chapters.join("--"));
+            if (chapters.length > 0) {
+              story.lastKnownChapter = chapters[0].title || lastKnownChapter;
+              await notifyNewChapters(story.title, chapters, storyUrl);
 
-          if (newChapters.length === 0) {
-            logInfo(`No new chapters for ${story.title} (ordering mismatch).`);
+              logInfo(
+                `Updated ${story.title} with ${chapters.length} new chapter(s). Latest: ${story.lastKnownChapter}`
+              );
+            }
+
             story.lastCheckedAt = new Date().toISOString();
-            continue;
+          } catch (err) {
+            console.error(`Failed to scrape ${story.title}:`, err);
           }
-        }
+        })
+      );
 
-        // if (newChapters.length > 0) {
-        //   story.lastKnownChapter = newChapters[0].title || lastKnown;
-        //   await notifyNewChapters(story.title, newChapters, story.url);
-
-        //   logInfo(
-        //     `Updated ${story.title} with ${newChapters.length} new chapter(s). Latest: ${story.lastKnownChapter}`
-        //   );
-        // }
-
-        story.lastCheckedAt = new Date().toISOString();
-      } catch (err) {
-        console.error(`Failed to scrape ${story.title}:`, err);
-      }
-      await new Promise((r) => setTimeout(r, 3000));
+      // Small cooldown between batches (VERY important)
+      await new Promise((r) => setTimeout(r, 5000));
     }
   } finally {
-    await closeBrowser(); // ✅ clean shutdown
+    await closeBrowser(); // ✅ still clean shutdown
   }
 
   writeStories(data);
-  logInfo("All stories updated!");
-}
-
-export async function seedStories(): Promise<void> {
-  const data = readStories();
-  const stories = data.stories;
-  const browser = await getBrowser();
-
-  try {
-    for (const story of stories) {
-      logInfo(`Seeding: ${story.title}`);
-      try {
-        const result = await scrapeUrl(story.url, browser);
-        const chapters = result.chapters;
-        const lastKnown = story.lastKnownChapter;
-
-        if (!lastKnown && chapters.length > 0) {
-          story.lastKnownChapter = chapters[0].title || null;
-          logInfo(
-            `Seeded ${story.title}. Latest chapter: ${story.lastKnownChapter}`
-          );
-          continue;
-        } else {
-          logInfo(`${story.title} already seeded.`);
-        }
-      } catch (err) {
-        console.error(`Failed to scrape ${story.title} during seeding:`, err);
-      }
-      await new Promise((r) => setTimeout(r, 3000));
-    }
-  } finally {
-    await closeBrowser(); // ✅ clean shutdown
-  }
-
-  writeStories(data);
-  logInfo("Seeding completed for all stories!");
+  console.log("\n✅ All stories updated!");
 }
