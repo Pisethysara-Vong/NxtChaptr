@@ -30,9 +30,19 @@ export class GenericScraper implements Scraper {
     const page = await browser.newPage();
 
     try {
-      await page.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
-      );
+      await page.setExtraHTTPHeaders({
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+      });
+
+      await page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 10000,
+      });
 
       await page.setRequestInterception(true);
       page.on("request", (req) => {
@@ -44,11 +54,6 @@ export class GenericScraper implements Scraper {
         }
       });
 
-      await page.goto(url, {
-        waitUntil: "domcontentloaded",
-        timeout: 10000,
-      });
-
       const chaptersTab = await page.$(
         'button[role="tab"][data-key="chapters"]'
       );
@@ -58,7 +63,7 @@ export class GenericScraper implements Scraper {
       }
 
       await page
-        .waitForSelector(this.config.tabSelector || "", { timeout: 10000 })
+        .waitForSelector(this.config.tabSelector || "", { timeout: 8000 })
         .catch(() => null);
 
       // Try to expand chapter list if button exists
@@ -76,7 +81,7 @@ export class GenericScraper implements Scraper {
                 document.querySelectorAll("#chapter-list > div").length > 10
               );
             },
-            { timeout: 5000 }
+            { timeout: 8000 }
           ),
         ]);
       }
@@ -129,9 +134,19 @@ export class GenericScraper implements Scraper {
     const page = await browser.newPage();
 
     try {
-      await page.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
-      );
+      await page.setExtraHTTPHeaders({
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+      });
+
+      await page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 10000,
+      });
 
       await page.setRequestInterception(true);
       page.on("request", (req) => {
@@ -143,22 +158,16 @@ export class GenericScraper implements Scraper {
         }
       });
 
-      await page.goto(url, {
-        waitUntil: "domcontentloaded",
-        timeout: 10000,
-      });
-
       const chaptersTab = await page.$(
         'button[role="tab"][data-key="chapters"]'
       );
 
       if (chaptersTab) {
-        console.log("Clicking chapters tab...");
         await chaptersTab.click();
       }
 
       await page
-        .waitForSelector(this.config.tabSelector || "", { timeout: 10000 })
+        .waitForSelector(this.config.tabSelector || "", { timeout: 8000 })
         .catch(() => null);
 
       const result = await page.evaluate((config) => {

@@ -4,7 +4,7 @@
   "description": "A web application to track updates from various story sources and notify users via email.",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' --watch '.env' --exec 'ts-node-dev --respawn --transpile-only src/app.ts'",
     "seeder": "ts-node src/seed.ts",
     "build": "tsc",
     "postbuild": "cp -r src/config dist/config",
@@ -23,13 +23,17 @@
     "express": "^5.2.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
-    "puppeteer": "^24.34.0"
+    "puppeteer": "^24.34.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-anonymize-ua": "^2.4.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.3",
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^7.0.4",
+    "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"

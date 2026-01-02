@@ -25,6 +25,10 @@ export async function updateStories(): Promise<void> {
 
           try {
             const result = await scrapeUrl(storyUrl, browser, lastKnownChapter);
+            if (result.storyTitle === "") {
+              logInfo(`⚠️ Could not scrape ${story.title} due to expired cf_clearance cookie. Skipping.`);
+              return;
+            }
             const chapters = result.chapters;
 
             if (chapters.length === 0) {
@@ -38,7 +42,7 @@ export async function updateStories(): Promise<void> {
               await notifyNewChapters(story.title, chapters, storyUrl);
 
               logInfo(
-                `Updated ${story.title} with ${chapters.length} new chapter(s). Latest: ${story.lastKnownChapter}`
+                `✅ Updated ${story.title} with ${chapters.length} new chapter(s). Latest: ${story.lastKnownChapter}`
               );
             }
 
@@ -50,7 +54,7 @@ export async function updateStories(): Promise<void> {
       );
 
       // Small cooldown between batches (VERY important)
-      await new Promise((r) => setTimeout(r, 5000));
+      await new Promise((r) => setTimeout(r, 8000));
     }
   } finally {
     await closeBrowser(); // ✅ still clean shutdown

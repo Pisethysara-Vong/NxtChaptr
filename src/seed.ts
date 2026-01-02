@@ -24,11 +24,15 @@ export async function seedStories(): Promise<void> {
 
           try {
             const result = await scrapeSeed(story.url, browser);
+            if (result.storyTitle === "") {
+              logInfo(`⚠️ Could not scrape ${story.title} due to expired cf_clearance cookie. Skipping.`);
+              return;
+            }
             const chapters = result.chapters;
             const lastKnown = story.lastKnownChapter;
 
             if (chapters.length === 0) {
-              logInfo(`No chapters found for ${story.title}. Skipping.`);
+              logInfo(`⏩ No chapters found for ${story.title}. Skipping.`);
               return;
             }
 
@@ -59,9 +63,9 @@ seedStories();
 
 // async function test() {
 //   const browser = await getBrowser();
-//   const lastKnownChapter = 'Chapter 79';
-//   const url = "https://weebcentral.com/series/01K27G582KZJ5TPCJ5K83MSPX4/the-100th-regression-of-the-maxlevel-player";
-//   const result = await scrapeUrl(url, browser, lastKnownChapter);
+//   const lastKnownChapter = "Chapter 95";
+//   const url = "https://arenascan.com/manga/surviving-as-a-pd-idol/";
+//   const result = await scrapeSeed(url, browser);
 //   console.log(result);
 // }
 

@@ -1,10 +1,10 @@
+import dns from "dns/promises";
 import "dotenv/config";
 import express from "express";
 import { INTERVAL_MINUTES } from "./constants/constants";
 import { updateStories } from "./scheduler/poller";
-import { logInfo } from "./utils/logger";
-import dns from "dns/promises";
 import "./scraper/registerScrapers"; // Register all scrapers
+import { logInfo } from "./utils/logger";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

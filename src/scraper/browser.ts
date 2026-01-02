@@ -1,4 +1,10 @@
-import puppeteer, { Browser } from "puppeteer";
+import { Browser } from "puppeteer";
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import AnonUA from 'puppeteer-extra-plugin-anonymize-ua';
+
+puppeteer.use(StealthPlugin());
+puppeteer.use(AnonUA());
 
 let browser: Browser | null = null;
 
